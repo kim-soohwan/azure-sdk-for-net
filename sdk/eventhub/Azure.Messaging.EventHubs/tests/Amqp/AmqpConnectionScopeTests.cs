@@ -42,12 +42,12 @@ namespace Azure.Messaging.EventHubs.Tests
         {
             get
             {
-                yield return new object[] { new PartitionPublishingOptions { ProducerGroupId = 123 } };
-                yield return new object[] { new PartitionPublishingOptions { OwnerLevel = 123 } };
-                yield return new object[] { new PartitionPublishingOptions { StartingSequenceNumber = 123 } };
-                yield return new object[] { new PartitionPublishingOptions { ProducerGroupId = 123, OwnerLevel = 789 } };
-                yield return new object[] { new PartitionPublishingOptions { ProducerGroupId = 123, StartingSequenceNumber = 789 } };
-                yield return new object[] { new PartitionPublishingOptions { StartingSequenceNumber = 123, OwnerLevel = 789 } };
+                yield return new object[] { new PartitionPublishingOptionsInternal { ProducerGroupId = 123 } };
+                yield return new object[] { new PartitionPublishingOptionsInternal { OwnerLevel = 123 } };
+                yield return new object[] { new PartitionPublishingOptionsInternal { StartingSequenceNumber = 123 } };
+                yield return new object[] { new PartitionPublishingOptionsInternal { ProducerGroupId = 123, OwnerLevel = 789 } };
+                yield return new object[] { new PartitionPublishingOptionsInternal { ProducerGroupId = 123, StartingSequenceNumber = 789 } };
+                yield return new object[] { new PartitionPublishingOptionsInternal { StartingSequenceNumber = 123, OwnerLevel = 789 } };
             }
         }
 
@@ -1108,7 +1108,7 @@ namespace Azure.Messaging.EventHubs.Tests
             var cancellationSource = new CancellationTokenSource();
             cancellationSource.Cancel();
 
-            Assert.That(() => scope.OpenProducerLinkAsync(partitionId, TransportProducerFeatures.None, new PartitionPublishingOptions(), TimeSpan.FromDays(1), identifier, cancellationSource.Token), Throws.InstanceOf<TaskCanceledException>());
+            Assert.That(() => scope.OpenProducerLinkAsync(partitionId, TransportProducerFeatures.None, new PartitionPublishingOptionsInternal(), TimeSpan.FromDays(1), identifier, cancellationSource.Token), Throws.InstanceOf<TaskCanceledException>());
         }
 
         /// <summary>
@@ -1129,7 +1129,7 @@ namespace Azure.Messaging.EventHubs.Tests
             var scope = new AmqpConnectionScope(endpoint, endpoint, eventHub, credential.Object, transport, null, idleTimeout, identifier);
             scope.Dispose();
 
-            Assert.That(() => scope.OpenProducerLinkAsync(null, TransportProducerFeatures.None, new PartitionPublishingOptions(), TimeSpan.FromDays(1), identifier, CancellationToken.None), Throws.InstanceOf<ObjectDisposedException>());
+            Assert.That(() => scope.OpenProducerLinkAsync(null, TransportProducerFeatures.None, new PartitionPublishingOptionsInternal(), TimeSpan.FromDays(1), identifier, CancellationToken.None), Throws.InstanceOf<ObjectDisposedException>());
         }
 
         /// <summary>
@@ -1149,7 +1149,7 @@ namespace Azure.Messaging.EventHubs.Tests
             var producerIdentifier = "producerId23!";
             var idleTimeout = TimeSpan.FromSeconds(30);
             var features = TransportProducerFeatures.IdempotentPublishing;
-            var options = new PartitionPublishingOptions();
+            var options = new PartitionPublishingOptionsInternal();
             var cancellationSource = new CancellationTokenSource();
             var mockConnection = new AmqpConnection(new MockTransport(), CreateMockAmqpSettings(), new AmqpConnectionSettings());
             var mockSession = new AmqpSession(mockConnection, new AmqpSessionSettings(), Mock.Of<ILinkFactory>());
@@ -1182,7 +1182,7 @@ namespace Azure.Messaging.EventHubs.Tests
                     ItExpr.Is<AmqpConnection>(value => value == mockConnection),
                     ItExpr.Is<Uri>(value => value.AbsoluteUri.StartsWith(endpoint.AbsoluteUri)),
                     ItExpr.Is<TransportProducerFeatures>(value => value == features),
-                    ItExpr.Is<PartitionPublishingOptions>(value => value == options),
+                    ItExpr.Is<PartitionPublishingOptionsInternal>(value => value == options),
                     ItExpr.IsAny<TimeSpan>(),
                     ItExpr.Is<string>(value => value == producerIdentifier),
                     ItExpr.Is<CancellationToken>(value => value == cancellationSource.Token))
@@ -1228,7 +1228,7 @@ namespace Azure.Messaging.EventHubs.Tests
                 CallBase = true
             };
 
-            var options = new PartitionPublishingOptions
+            var options = new PartitionPublishingOptionsInternal
             {
                 ProducerGroupId = 123,
                 OwnerLevel = 456,
@@ -1296,7 +1296,7 @@ namespace Azure.Messaging.EventHubs.Tests
             var transport = EventHubsTransportType.AmqpTcp;
             var identifier = "customIdentIFIER";
             var idleTimeout = TimeSpan.FromSeconds(30);
-            var options = new PartitionPublishingOptions();
+            var options = new PartitionPublishingOptionsInternal();
             var features = TransportProducerFeatures.IdempotentPublishing;
             var cancellationSource = new CancellationTokenSource();
             var mockConnection = new AmqpConnection(new MockTransport(), CreateMockAmqpSettings(), new AmqpConnectionSettings());
@@ -1413,7 +1413,7 @@ namespace Azure.Messaging.EventHubs.Tests
                     ItExpr.IsAny<TimeSpan>())
                 .Returns(Task.CompletedTask);
 
-            var link = await mockScope.Object.OpenProducerLinkAsync(partitionId, features, (PartitionPublishingOptions)options, TimeSpan.FromDays(1), identifier, cancellationSource.Token);
+            var link = await mockScope.Object.OpenProducerLinkAsync(partitionId, features, (PartitionPublishingOptionsInternal)options, TimeSpan.FromDays(1), identifier, cancellationSource.Token);
             Assert.That(link, Is.Not.Null, "The link produced was null");
 
             var linkTarget = (Target)link.Settings.Target;
@@ -1450,7 +1450,7 @@ namespace Azure.Messaging.EventHubs.Tests
                 CallBase = true
             };
 
-            var options = new PartitionPublishingOptions
+            var options = new PartitionPublishingOptionsInternal
             {
                 ProducerGroupId = 123,
                 OwnerLevel = 456,
@@ -1564,7 +1564,7 @@ namespace Azure.Messaging.EventHubs.Tests
             Assert.That(activeLinks, Is.Not.Null, "The set of active links was null.");
             Assert.That(activeLinks.Count, Is.Zero, "There should be no active links when none have been created.");
 
-            var link = await mockScope.Object.OpenProducerLinkAsync(null, TransportProducerFeatures.None, new PartitionPublishingOptions(), TimeSpan.FromDays(1), identifier, cancellationSource.Token);
+            var link = await mockScope.Object.OpenProducerLinkAsync(null, TransportProducerFeatures.None, new PartitionPublishingOptionsInternal(), TimeSpan.FromDays(1), identifier, cancellationSource.Token);
             Assert.That(link, Is.Not.Null, "The link produced was null");
 
             Assert.That(activeLinks.Count, Is.EqualTo(1), "There should be an active link being tracked.");
@@ -1656,7 +1656,7 @@ namespace Azure.Messaging.EventHubs.Tests
                     ItExpr.IsAny<TimeSpan>())
                 .Returns(Task.CompletedTask);
 
-            var link = await mockScope.Object.OpenProducerLinkAsync(null, TransportProducerFeatures.None, new PartitionPublishingOptions(), TimeSpan.FromDays(1), identifier, cancellationSource.Token);
+            var link = await mockScope.Object.OpenProducerLinkAsync(null, TransportProducerFeatures.None, new PartitionPublishingOptionsInternal(), TimeSpan.FromDays(1), identifier, cancellationSource.Token);
             Assert.That(link, Is.Not.Null, "The link produced was null");
 
             var activeLinks = GetActiveLinks(mockScope.Object);
@@ -1737,7 +1737,7 @@ namespace Azure.Messaging.EventHubs.Tests
                     ItExpr.IsAny<TimeSpan>())
                 .Returns(Task.CompletedTask);
 
-            var link = await mockScope.Object.OpenProducerLinkAsync(null, TransportProducerFeatures.None, new PartitionPublishingOptions(), TimeSpan.FromDays(1), identifier, cancellationSource.Token);
+            var link = await mockScope.Object.OpenProducerLinkAsync(null, TransportProducerFeatures.None, new PartitionPublishingOptionsInternal(), TimeSpan.FromDays(1), identifier, cancellationSource.Token);
             Assert.That(link, Is.Not.Null, "The link produced was null");
 
             var activeLinks = GetActiveLinks(mockScope.Object);
@@ -1824,7 +1824,7 @@ namespace Azure.Messaging.EventHubs.Tests
             var mockSession = new AmqpSession(mockConnection, new AmqpSessionSettings(), Mock.Of<ILinkFactory>());
             var mockScope = new DisposeOnAuthorizationTimerCallbackMockScope(endpoint, endpoint, eventHub, credential.Object, transport, null, idleTimeout);
 
-            var link = await mockScope.OpenProducerLinkAsync(null, TransportProducerFeatures.None, new PartitionPublishingOptions(), TimeSpan.FromDays(1), null, cancellationSource.Token);
+            var link = await mockScope.OpenProducerLinkAsync(null, TransportProducerFeatures.None, new PartitionPublishingOptionsInternal(), TimeSpan.FromDays(1), null, cancellationSource.Token);
             Assert.That(link, Is.Not.Null, "The link produced was null");
 
             var activeLinks = GetActiveLinks(mockScope);
@@ -2109,7 +2109,7 @@ namespace Azure.Messaging.EventHubs.Tests
             var idleTimeout = TimeSpan.FromSeconds(30);
             var mockCredential = new Mock<TokenCredential>();
             var mockEventHubsCredential = new Mock<EventHubTokenCredential>(mockCredential.Object);
-            var mockTokenProvider = new CbsTokenProvider(mockEventHubsCredential.Object, CancellationToken.None);
+            var mockTokenProvider = new CbsTokenProvider(mockEventHubsCredential.Object, TimeSpan.Zero, CancellationToken.None);
             var mockScope = new MockConnectionScope(endpoint, endpoint, eventHub, mockEventHubsCredential.Object, transport, null, idleTimeout);
 
             // This is brittle, but the AMQP library does not support mocking nor setting this directly.
@@ -2159,11 +2159,12 @@ namespace Azure.Messaging.EventHubs.Tests
             var currentTime = new DateTime(2015, 10, 27, 00, 00, 00);
             var expireTime = currentTime.AddHours(1);
             var buffer = GetAuthorizationRefreshBuffer();
+            var jitterBuffer = TimeSpan.FromSeconds(GetAuthorizationBaseJitterSeconds()).Add(TimeSpan.FromSeconds(5));
             var calculatedRefresh = mockScope.InvokeCalculateLinkAuthorizationRefreshInterval(expireTime, currentTime);
             var calculatedExpire = currentTime.Add(calculatedRefresh);
 
             Assert.That(calculatedExpire, Is.LessThan(expireTime), "The refresh should be account for the buffer and be earlier than expiration.");
-            Assert.That(calculatedExpire, Is.EqualTo(expireTime.Subtract(buffer)).Within(TimeSpan.FromSeconds(2)), "The authorization buffer should have been used for buffering.");
+            Assert.That(calculatedExpire, Is.EqualTo(expireTime.Subtract(buffer)).Within(jitterBuffer), "The authorization buffer should have been used for buffering.");
         }
 
         /// <summary>
@@ -2180,10 +2181,12 @@ namespace Azure.Messaging.EventHubs.Tests
             var mockScope = new MockConnectionScope(endPoint, endPoint, "test", credential.Object, EventHubsTransportType.AmqpTcp, null, idleTimeout);
             var currentTime = new DateTime(2015, 10, 27, 00, 00, 00);
             var minimumRefresh = GetMinimumAuthorizationRefresh();
+            var jitterBuffer = TimeSpan.FromSeconds(GetAuthorizationBaseJitterSeconds()).Add(TimeSpan.FromSeconds(5));
             var expireTime = currentTime.Add(minimumRefresh.Subtract(TimeSpan.FromMilliseconds(500)));
             var calculatedRefresh = mockScope.InvokeCalculateLinkAuthorizationRefreshInterval(expireTime, currentTime);
 
-            Assert.That(calculatedRefresh, Is.EqualTo(minimumRefresh), "The minimum refresh duration should have been used.");
+            Assert.That(calculatedRefresh, Is.GreaterThanOrEqualTo(minimumRefresh), "The minimum refresh duration should be violated.");
+            Assert.That(calculatedRefresh, Is.EqualTo(minimumRefresh).Within(jitterBuffer), "The minimum refresh duration should have been used.");
         }
 
         /// <summary>
@@ -2200,11 +2203,13 @@ namespace Azure.Messaging.EventHubs.Tests
             var mockScope = new MockConnectionScope(endPoint, endPoint, "test", credential.Object, EventHubsTransportType.AmqpTcp, null, idleTimeout);
             var currentTime = new DateTime(2015, 10, 27, 00, 00, 00);
             var refreshBuffer = GetAuthorizationRefreshBuffer();
+            var jitterBuffer = TimeSpan.FromSeconds(GetAuthorizationBaseJitterSeconds()).Add(TimeSpan.FromSeconds(5));
             var maximumRefresh = GetMaximumAuthorizationRefresh();
             var expireTime = currentTime.Add(maximumRefresh.Add(refreshBuffer).Add(TimeSpan.FromMilliseconds(500)));
             var calculatedRefresh = mockScope.InvokeCalculateLinkAuthorizationRefreshInterval(expireTime, currentTime);
 
-            Assert.That(calculatedRefresh, Is.EqualTo(maximumRefresh), "The maximum refresh duration should have been used.");
+            Assert.That(calculatedRefresh, Is.LessThanOrEqualTo(maximumRefresh), "The maximum refresh duration should not be exceeded.");
+            Assert.That(calculatedRefresh, Is.EqualTo(maximumRefresh).Within(jitterBuffer), "The maximum refresh duration should have been used.");
         }
 
         /// <summary>
@@ -2313,6 +2318,17 @@ namespace Azure.Messaging.EventHubs.Tests
             (TimeSpan)
                 typeof(AmqpConnectionScope)
                     .GetProperty("MaximumAuthorizationRefresh", BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.GetProperty)
+                    .GetValue(null);
+
+        /// <summary>
+        ///   Gets the base time used to calculate random jitter for refreshing authorization,
+        ///   using the private accessor.
+        /// </summary>
+        ///
+        private static int GetAuthorizationBaseJitterSeconds() =>
+            (int)
+                typeof(AmqpConnectionScope)
+                    .GetProperty("AuthorizationBaseJitterSeconds", BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.GetProperty)
                     .GetValue(null);
 
         /// <summary>

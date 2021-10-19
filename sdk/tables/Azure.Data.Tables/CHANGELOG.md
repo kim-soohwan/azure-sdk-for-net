@@ -1,14 +1,27 @@
 # Release History
 
-## 12.2.0-beta.2 (Unreleased)
+## 12.3.0-beta.1 (Unreleased)
 
 ### Features Added
 
 ### Breaking Changes
 
 ### Bugs Fixed
+- Table entities now support UInt64 (ulong) properties. ([#24750](https://github.com/Azure/azure-sdk-for-net/issues/24750))
 
 ### Other Changes
+
+## 12.2.1 (2021-10-14)
+
+### Bugs Fixed
+- Handle the case where the Uri parameter to the `TableClient` constructor contains the table name. ([#24667](https://github.com/Azure/azure-sdk-for-net/issues/24667))
+
+## 12.2.0 (2021-09-07)
+
+### Bugs Fixed
+
+- Properly handle `GenerateSasUri` when the client is constructed with a connection string ([#23404](https://github.com/Azure/azure-sdk-for-net/issues/23404))
+- Fixed an exception when constructing the `TableClient` with a connection string where the table name is the same as the account name.
 
 ## 12.2.0-beta.1 (2021-08-10)
 
@@ -19,6 +32,7 @@ Thank you to our developer community members who helped to make Azure Tables bet
 
 ### Features Added
 
+- Added support for customization of how model properties are serialized. Decorating a model property with the `[IgnoreDataMember]` attribute will ignore it on serialization and the `[DataMember(Name = "some_new_name")]` will rename the property.
 - Added an extension method to the Builder extensions that accepts just the Table Uri. (A community contribution, courtesy of _[flcdrg](https://github.com/flcdrg))_.
 
 ### Bugs Fixed

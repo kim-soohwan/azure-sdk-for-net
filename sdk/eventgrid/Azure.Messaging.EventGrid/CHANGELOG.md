@@ -1,5 +1,21 @@
 # Release History
 
+## 4.8.0-beta.1 (Unreleased)
+
+### Features Added
+
+### Breaking Changes
+
+### Bugs Fixed
+
+### Other Changes
+
+## 4.7.0 (2021-10-05)
+
+### Features Added
+- Added API Management events
+- Added AcsUserDisconnectedEventData event
+
 ## 4.6.0 (2021-08-10)
 
 ### Features Added
